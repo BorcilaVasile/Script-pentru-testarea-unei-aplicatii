@@ -7,3 +7,6 @@ Am studiat urmatoarele articole ce fac referire la framework-urile de testare a 
 ->https://ro.myservername.com/application-testing-into-basics-software-testing
 ->https://katalon.com/resources-center/blog/java-testing-frameworks
 ->https://www.selenium.dev/documentation/
+
+# 18.06.2024
+Am adaugat un test de verificare pentru o aplicatie. In el verific timpul de executie, apelurile de sistem, valoarea returnata de executia aplicatiei si rezultatul obtinut.
