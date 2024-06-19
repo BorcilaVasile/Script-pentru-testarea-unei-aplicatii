@@ -10,3 +10,6 @@ Am studiat urmatoarele articole ce fac referire la framework-urile de testare a 
 
 # 18.06.2024
 Am adaugat un test de verificare pentru o aplicatie. In el verific timpul de executie, apelurile de sistem, valoarea returnata de executia aplicatiei si rezultatul obtinut.
+
+# 19.06.2024
+Am implementat vizualizarea diferentelor dintre rezultatul dorit si cel obtinut, a fisierelor create, a apelurilor de biblioteca si a semnalelor transmise. Acestea functioneaza independent pentru fiecare test asupra codului daca acesta primeste input doar prin intermediul parametrilor. 

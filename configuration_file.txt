@@ -1,0 +1,4 @@
+Path to application: /home/vasile/Desktop/Proiect_practica/arithmetic
+Arguments: arguments.txt
+Input files: 
+Expected output files: expected_output.txt
