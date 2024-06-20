@@ -7,8 +7,6 @@ isExecutable(){
     fi
     permisions=$(ls -ld $1| cut -f1 -d" " )
     user=${permisions:3:1}
-    #group=${permisions:6:1}
-    #others=${permisions:9:1}
     if [[ $user != "x" ]]; then 
         echo "Nu aveti drepturi de executie asupra fisierului" 
         return 0
@@ -18,13 +16,13 @@ isExecutable(){
 
 exec 3< expected_output.txt
 read_next_line() {
-    read -r line <&3
-    echo "$line" 
+    read -r line_output <&3
+    echo "$line_output" 
 }
 
 echo "Test started..." 
 echo "Configuration file is verified..." 
-#verificarea fisierelor de configurare
+#verificarea fisierului de configurare
 if [[ ! -f configuration_file.txt ]]; then 
     echo "Fisierul de configurare nu exista" 
     exit 1
@@ -33,6 +31,8 @@ fi
 configuration_set=1 
 path_app="" 
 path_outputFile=""
+declare -a inputFiles
+declare -a arguments
 while read -r line
 do
     type=$(echo "$line" |cut -f1 -d":")
@@ -45,6 +45,24 @@ do
             path_app=$value
         fi
     fi 
+
+    if [[ $type == "Arguments" ]]; then 
+        j=0 
+        while read -r line 
+        do 
+            arguments[$j]=$line
+            j=$((j+1))
+        done < $value
+    fi
+
+    if [[ $type == "Input files" ]]; then 
+        j=0
+        for word in $value
+        do 
+            inputFiles[$j]=$word
+            j=$((j+1))
+        done 
+    fi
     if [[ $type == "Expected output files" ]]; then 
         if [[ -z $value ]]; then
             echo "The output expected for the application is not set." 
@@ -55,6 +73,7 @@ do
         fi
     fi 
 done < configuration_file.txt 
+
 
 if [[ $configuration_set -eq 0 ]]; then
     echo "Write the configuration file properly" 
@@ -137,24 +156,41 @@ else
     show_system_calls=1
     show_library_calls=1
 fi
-
-if [[ $choice =~ [1] ]]; then 
-    execution_time=1
-fi  
+ 
 
 i=1
+j=0
 passed_test=0
-while read -r arg
+
+for arg in "${arguments[@]}"
 do 
     succes=1
     echo " "
     echo -ne "\033[1;4;34mTest $i\033[0m"
     i=$((i+1))
+   
 
 
     #time and returned value 
     start_time=$(date +%s.%N)
-    result=$($path_app $arg 2>errors.txt)
+
+    if [[ -z $inputFiles ]]; then 
+        result=$($path_app $arg 2>errors.txt)
+        #system calls and library calls
+        strace -o strace_output.txt $path_app $arg >/dev/null 2>/dev/null & 
+        strace -e trace=signal -o strace_signals.txt $path_app $arg >/dev/null 2>/dev/null &
+        ltrace -o ltrace_output.txt $path_app $arg >/dev/null 2>/dev/null &
+        wait 
+    else 
+        result=$($path_app $arg < "${inputFiles[$j]}" 2>errors.txt)
+        #system calls and library calls
+        strace -o strace_output.txt $path_app $arg < "${inputFiles[$j]}" >/dev/null 2>/dev/null &
+        strace -e trace=signal -o strace_signals.txt $path_app $arg < "${inputFiles[$j]}" >/dev/null 2>/dev/null &
+        ltrace -o ltrace_output.txt $path_app $arg < "${inputFiles[$j]}" >/dev/null 2>/dev/null &
+        wait
+    fi
+    j=$((j+1))
+
     return_code=$?
     end_time=$(date +%s.%N)
     execution_time=$(echo "scale=3; ($end_time - $start_time) / 1" | bc)
@@ -162,11 +198,7 @@ do
         execution_time="0$execution_time"
     fi
 
-    #system calls and library calls
-    strace -o strace_output.txt $path_app $arg >/dev/null 2>/dev/null & 
-    strace -e trace=signal -o strace_signals.txt $path_app $arg >/dev/null 2>/dev/null &
-    ltrace -o ltrace_output.txt $path_app $arg >/dev/null 2>/dev/null &
-    wait 
+   
 
 
     #output
@@ -200,16 +232,14 @@ do
             echo -e "\033[1mNo files created\033[0m"
         else  
             echo " "
-            echo -e "\033[1mFiles created:\033[0m"
-            echo "$files"
+            echo -e "\033[1mFiles created:\033[0m$files"
         fi
     fi
 
     #returned value
     if (( show_returned_value == 1 )); then
         echo " " 
-        echo -ne "\033[1mReturned value:\033[0m"
-        echo -n "$return_code"
+        echo -ne "\033[1mReturned value:\033[0m$return_code"
     fi 
     if (( return_code == 0 )); then
         if (( show_returned_value == 1 )); then 
@@ -228,13 +258,12 @@ do
     if [[ $line = $result ]]; then 
         if (( show_result == 1 )); then 
             echo " "
-            echo -ne "\033[1mExpected value:\033[0m"
-            echo  "$line"
+            echo -e "\033[1mExpected value:\033[0m$line"
             echo -ne "\033[1mObtained value:\033[0m"
             if [[ -z $result ]]; then 
                 echo -ne "\033[1;31m  NONE\033[0m" 
             else 
-                echo -n " $result"
+                echo -n "$result"
             fi
             echo -e "\033[1;32m  CORECT\033[0m"  
             echo " "
@@ -242,13 +271,12 @@ do
     else
         if (( show_result == 1 )); then 
             echo " "
-            echo -ne "\033[1mExpected value:\033[0m"
-            echo  "$line"
+            echo -e "\033[1mExpected value:\033[0m$line"
             echo -ne "\033[1mObtained value:\033[0m"
             if [[ -z $result ]]; then 
                 echo -ne "\033[1;31m  NONE\033[0m" 
             else 
-                echo -n " $result"
+                echo -n "$result"
             fi
             echo -e "\033[1;31m  WRONG\033[0m" 
             echo " "
@@ -285,11 +313,11 @@ do
     else 
         echo -e "\033[1;31m Failed\033[0m"
     fi 
-done < argumente.txt
+
+done
 exec 3<&-
 
 i=$((i-1))
 succes_rate=$((passed_test*100/i))
 echo " "
-echo -ne "\033[1mSucces rate: \033[0m"
-echo "$succes_rate%"
+echo -e "\033[1mSucces rate: \033[0m$succes_rate%"

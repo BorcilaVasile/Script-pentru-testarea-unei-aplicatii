@@ -13,3 +13,6 @@ Am adaugat un test de verificare pentru o aplicatie. In el verific timpul de exe
 
 # 19.06.2024
 Am implementat vizualizarea diferentelor dintre rezultatul dorit si cel obtinut, a fisierelor create, a apelurilor de biblioteca si a semnalelor transmise. Acestea functioneaza independent pentru fiecare test asupra codului daca acesta primeste input doar prin intermediul parametrilor. 
+
+# 20.06.2024
+Am finalizat scriptul pentru realizarea testelor, insa acesta functioneaza pe baza unui fisier de configuratie ce necesita o anumita forma specifica. Utilizatorul trebuie sa introduca in fisierul de configuratie calea catre aplicatie, fisierul ce contine argumentele necesare, fisierele de input si fisierul ce contine output-ul asteptat. 
