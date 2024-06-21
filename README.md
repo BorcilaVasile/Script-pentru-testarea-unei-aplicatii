@@ -16,3 +16,6 @@ Am implementat vizualizarea diferentelor dintre rezultatul dorit si cel obtinut,
 
 # 20.06.2024
 Am finalizat scriptul pentru realizarea testelor, insa acesta functioneaza pe baza unui fisier de configuratie ce necesita o anumita forma specifica. Utilizatorul trebuie sa introduca in fisierul de configuratie calea catre aplicatie, fisierul ce contine argumentele necesare, fisierele de input si fisierul ce contine output-ul asteptat. 
+
+# 21.06.2024
+Am inceput sa lucrez la o interfata pentru script-ul creat in python qt.

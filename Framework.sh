@@ -20,8 +20,8 @@ read_next_line() {
     echo "$line_output" 
 }
 
-echo "Test started..." 
-echo "Configuration file is verified..." 
+
+
 #verificarea fisierului de configurare
 if [[ ! -f configuration_file.txt ]]; then 
     echo "Fisierul de configurare nu exista" 
@@ -169,28 +169,15 @@ do
     echo -ne "\033[1;4;34mTest $i\033[0m"
     i=$((i+1))
    
-
-
     #time and returned value 
     start_time=$(date +%s.%N)
-
+    echo "1"
     if [[ -z $inputFiles ]]; then 
         result=$($path_app $arg 2>errors.txt)
-        #system calls and library calls
-        strace -o strace_output.txt $path_app $arg >/dev/null 2>/dev/null & 
-        strace -e trace=signal -o strace_signals.txt $path_app $arg >/dev/null 2>/dev/null &
-        ltrace -o ltrace_output.txt $path_app $arg >/dev/null 2>/dev/null &
-        wait 
     else 
         result=$($path_app $arg < "${inputFiles[$j]}" 2>errors.txt)
-        #system calls and library calls
-        strace -o strace_output.txt $path_app $arg < "${inputFiles[$j]}" >/dev/null 2>/dev/null &
-        strace -e trace=signal -o strace_signals.txt $path_app $arg < "${inputFiles[$j]}" >/dev/null 2>/dev/null &
-        ltrace -o ltrace_output.txt $path_app $arg < "${inputFiles[$j]}" >/dev/null 2>/dev/null &
-        wait
     fi
-    j=$((j+1))
-
+    echo "2"
     return_code=$?
     end_time=$(date +%s.%N)
     execution_time=$(echo "scale=3; ($end_time - $start_time) / 1" | bc)
@@ -198,7 +185,19 @@ do
         execution_time="0$execution_time"
     fi
 
-   
+    #system calls and library calls
+    if [[ -z $inputFiles ]]; then 
+        strace -o strace_output.txt $path_app $arg >/dev/null 2>/dev/null & 
+        strace -e trace=signal -o strace_signals.txt $path_app $arg >/dev/null 2>/dev/null &
+        ltrace -o ltrace_output.txt $path_app $arg >/dev/null 2>/dev/null &
+        wait 
+    else 
+        strace -o strace_output.txt $path_app $arg < "${inputFiles[$j]}" >/dev/null 2>/dev/null &
+        strace -e trace=signal -o strace_signals.txt $path_app $arg < "${inputFiles[$j]}" >/dev/null 2>/dev/null &
+        ltrace -o ltrace_output.txt $path_app $arg < "${inputFiles[$j]}" >/dev/null 2>/dev/null &
+        wait
+    fi
+    j=$((j+1))
 
 
     #output
