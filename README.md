@@ -19,3 +19,7 @@ Am finalizat scriptul pentru realizarea testelor, insa acesta functioneaza pe ba
 
 # 21.06.2024
 Am inceput sa lucrez la o interfata pentru script-ul creat in python qt.
+
+# 24.06.2024
+Am adaugat o interfata grafica pentru script astfel incat interactiunea utilizatorului cu mediul de testare sa fie mai usor de realizat. La deschiderea interfetei, utilizatorului ii va fi prezentata o fereastra in care va introduce calea catre aplicatie/fisierul executabil, o lista cu optiuni de afisare a detaliilor fiecarui test si un buton de adaugare a unui nou test care va deschide o noua fereastra cu trei campuri (argumente, input si expected output) ce vor fi completate in functie de necesitatile utilizatorului.
+Dupa adaugarea acestor detalii de testare, se va incepe testarea prin apasarea butonului de start test care va rula scriptul de testare si va prelua informatiile oferite de acesta pentru a le afisa utilizatorului. 
